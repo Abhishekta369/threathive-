@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intrusion Detection System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Courier New', monospace;
+            background: black;
+            color: #0f0;
+            text-align: center;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background 0.5s ease;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.6);
+            width: 100%;
+            max-width: 1200px;
+            backdrop-filter: blur(5px);
+            animation: glitch 1s infinite alternate;
+        }
+        @keyframes glitch {
+            from { text-shadow: 2px 2px 5px #0f0; }
+            to { text-shadow: -2px -2px 5px #0f0; }
+        }
+        h1 {
+            margin-bottom: 20px;
+            color: #0f0;
+        }
+        #intrusion-status {
+            font-size: 24px;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        .safe {
+            color: #0f0;
+        }
+        .alert {
+            color: red;
+            animation: flicker 0.5s infinite alternate;
+        }
+        @keyframes flicker {
+            from { opacity: 1; }
+            to { opacity: 0.3; }
+        }
+        .info-box {
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 18px;
+            color: #0f0;
+        }
+        pre {
+            text-align: left;
+            background: black;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-top: 10px;
+            height: 300px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        canvas {
+            margin-top: 20px;
+            width: 100% !important;
+            max-height: 400px;
+            background: black;
+            border-radius: 5px;
+            padding: 10px;
+            border: 1px solid #0f0;
+        }
+    </style>
+    <script>
+        let chart;
+        function createChart() {
+            const ctx = document.getElementById('trafficChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Intrusion Rate',
+                        borderColor: '#0f0',
+                        backgroundColor: 'rgba(0, 255, 0, 0.3)',
+                        data: [],
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: true },
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+        
+        function updateChart(value) {
+            const timeLabel = new Date().toLocaleTimeString();
+            if (chart.data.labels.length > 10) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+            }
+            chart.data.labels.push(timeLabel);
+            chart.data.datasets[0].data.push(value);
+            chart.update();
+        }
+
+        function fetchLiveData() {
+            fetch('/live_data')
+                .then(response => response.json())
+                .then(data => {
+                    const statusElement = document.getElementById('intrusion-status');
+                    const redirectionStatusElement = document.getElementById('redirection-status');
+
+                    // Intrusion status
+                    if (data.intrusion_name && data.intrusion_name !== "Normal") {
+                        statusElement.textContent = "⚠ Intrusion Detected: " + data.intrusion_name;
+                        statusElement.className = "alert";
+                        updateChart(1);
+                    } else {
+                        statusElement.textContent = "✅ No Intrusion";
+                        statusElement.className = "safe";
+                        updateChart(0);
+                    }
+
+                    // Redirection status
+                    if (data.is_redirected) {
+                        redirectionStatusElement.textContent = "🔴 Traffic Redirected to Honeypot!";
+                        redirectionStatusElement.className = "alert";
+                    } else {
+                        redirectionStatusElement.textContent = "🟢 Traffic is Normal.";
+                        redirectionStatusElement.className = "safe";
+                    }
+
+                    document.getElementById('ping-time').textContent = "Ping: " + (data.ping_time || '--') + " ms";
+                    document.getElementById('packet-data').textContent = data.features && data.features.length > 0 ? JSON.stringify(data.features, null, 2) : "No packets captured yet.";
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('intrusion-status').textContent = "⚠ Error fetching data";
+                    document.getElementById('intrusion-status').className = "alert";
+                    document.getElementById('redirection-status').textContent = "⚠ Error fetching redirection status";
+                    document.getElementById('redirection-status').className = "alert";
+                });
+        }
+        
+        window.onload = function() {
+            createChart();
+            fetchLiveData();
+            setInterval(fetchLiveData, 3000); // Update data every 3 seconds
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Intrusion Detection System</h1>
+        <h2 id="intrusion-status" class="safe">Loading...</h2>
+        <p class="info-box" id="ping-time">Ping: --</p>
+        <p class="info-box" id="redirection-status">Traffic Status: Loading...</p>
+        <canvas id="trafficChart"></canvas>
+        <pre id="packet-data">Packet Features: Loading...</pre>
+    </div>
+</body>
+</html>
