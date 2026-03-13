@@ -231,16 +231,3 @@ The logs generated are stored in the logs database with a backup set as a cronjo
 &nbsp;
 &nbsp;
 
-## Achivements and Credits
-
-To test Honeytrack, we set it up live on Azure Cloud ☁️ and monitored attacks for 30 days which generated 1,000,000+ logs 📊. This provided a great insight on both - the tool as well as the emerging Cyberattacks throughout the world 🌎.
-
-After the successful tests, we collaborated 🤝🏻 with Cyberpeace Foundation through Department of Cybersecurity at Shah and Anchor Kutchhi Engineering College.
-
-This project was exhibited for the first CiiA Exhibition at Worli, Mumbai where Innovative projects were presented. The project also won 2nd 🥈 Prize at "Technovation" - National Paper Presentation Competition.
-
-An [IEEE Paper](https://ieeexplore.ieee.org/document/10063105) Presentation and Publication at SCEECS 2023, MANIT, Bhopal and a Journal Publication by [JEITR](https://www.jetir.org/papers/JETIR2305F76.pdf) are published.
-
-&nbsp;
-
-Made as a part of 2nd Year and 3rd Year (2021-2023) Engineering Academic Project by: @aatharvauti [hi@auti.dev], @hackvm, @thejaymakwana, and @shrawinnie
