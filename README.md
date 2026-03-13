@@ -204,7 +204,7 @@ The logs generated are stored in the logs database with a backup set as a cronjo
 
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    Do you want to configure email transfer? (Y/n): y
+    Do you want to configure email transfer? (Y/n): Y
     Enter the Correspondent's EMAIL Address
     example@example.com
 
